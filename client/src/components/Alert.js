@@ -1,10 +1,16 @@
-import React from 'react'
+import React, { useContext } from 'react'
+import AlertContext from '../context/alert/AlertContext'
 
-const Alert = (props) => {
+const Alert = () => {
+    const context = useContext(AlertContext);
+
+    const { alert, alertType } = context;    
+
     return (
-        <div className="alert alert-success" role="alert">
-            A simple success alert—check it out!
-            {props.message}        
+        <div className="w-100 position-fixed d-flex justify-content-center" style={{zIndex:'1'}} id='alert'>
+            <div className={`alert alert-${alertType} text-center my-1 w-50`} role="alert">
+                {alert}
+            </div>
         </div>
     )
 }

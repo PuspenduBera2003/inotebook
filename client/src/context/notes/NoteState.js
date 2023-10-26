@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import NoteContext from "./NoteContext";
+import AlertContext from "../alert/AlertContext";
 
 const NoteState = (props) => {
+    const Alertcontext = useContext(AlertContext);
+    const { setAlertMessage } = Alertcontext;
     const host = "http://localhost:5000"
     const InitialNotes = []
     const [notes, setNotes] = useState(InitialNotes)
@@ -59,7 +62,9 @@ const NoteState = (props) => {
         // Logic to delete at the client side
 
         const newNotes = notes.filter((note) => { return note._id !== id });
-        setNotes(newNotes)
+        setNotes(newNotes);
+
+        setAlertMessage("Note deleted successfully", "success")
     }
 
     // Edit a Note

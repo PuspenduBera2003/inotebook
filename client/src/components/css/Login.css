@@ -1,0 +1,7 @@
+#signup {
+    font-weight: bolder;
+}
+
+#signup:hover {
+    cursor: pointer;
+}

@@ -29,8 +29,10 @@ router.post('/createuser', [
 
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
 
+    let success = false;
+
     if (existingUser) {
-        return res.status(400).json({ error: 'Duplicate username or email.' });
+        return res.status(400).json({success, error: 'Duplicate username or email.' });
     }
 
     else {
@@ -39,21 +41,21 @@ router.post('/createuser', [
 
         // If 'name' has less than 5 characters return bad request
         if (!errors.isEmpty() && errors.errors[0].path === 'name') {
-            return res.status(400).send('Name must have minimum 5 characters');
+            return res.status(400).json({success, error: 'Name must have minimum 5 characters'});
         }
 
         // If 'username' has less than 5 characters return bad request
         if (!errors.isEmpty() && errors.errors[0].path === 'username') {
-            return res.status(400).send('Username must have minimum 5 characters');
+            return res.status(400).json({success, error: 'Username must have minimum 5 characters'});
         }
 
         // If password doesn't contain minimum 8 characters, including minimum one uppercase, one lowercase and one special character return bad request
         if (!errors.isEmpty() && errors.errors[0].path === 'password') {
-            return res.status(400).send('Password must contain 8 characters, which includes minimum one uppercase, one lowercase and one special character');
+            return res.status(400).json({success, error: 'Password must contain 8 characters, which includes minimum one uppercase, one lowercase and one special character'});
         }
 
         if (!errors.isEmpty() && errors.errors[0].path === 'email') {
-            return res.status(400).send('Invalid email address. Please try again.')
+            return res.status(400).json({success, error: 'Invalid email address. Please try again.'})
         }
 
         try {
@@ -72,13 +74,16 @@ router.post('/createuser', [
                 }
             }
             const authToken = jwt.sign(data, secretKey);
-            res.json({ authToken });
+            success = true;
+            res.json({success, authToken });
         } catch (err) {
             if (err.code === 11000) {
-                res.status(400).json({ error: 'Duplicate username or email.' });
+                success = false;
+                res.status(400).json({success, error: 'Duplicate username or email.' });
             } else {
+                success = false;
                 console.error(err);
-                res.status(500).json({ error: 'Server error.' });
+                res.status(500).json({success, error: 'Server error.' });
             }
         }
     }
@@ -101,13 +106,14 @@ router.post('/login', [
     const { username, password } = req.body;
     try {
         let user = await User.findOne({ username });
+        let success = false;
         if (!user) {
-            return res.status(400).json({ error: "Please login with correct credentials" });
+            return res.status(400).json({success, error: "Please login with correct credentials" });
         }
 
         const comparePassword = await bcrypt.compare(password, user.password);
         if (!comparePassword) {
-            return res.status(400).json({ error: "Please login with correct credentials" });
+            return res.status(400).json({success, error: "Please login with correct credentials" });
         }
 
         const data = {
@@ -116,7 +122,8 @@ router.post('/login', [
             }
         }
         const authToken = jwt.sign(data, secretKey);
-        res.json({ authToken });
+        success = true;
+        res.json({success, authToken });
 
     } catch (error) {
         console.error(error);

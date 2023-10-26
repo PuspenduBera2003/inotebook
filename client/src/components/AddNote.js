@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react'
 import NoteContext from '../context/notes/NoteContext'
 
-const AddNote = () => {
+const AddNote = (props) => {
     const context = useContext(NoteContext);
     const { addNote } = context;
     const [note, setNote] = useState({ title: "", description: "", tag: "default" });
@@ -9,6 +9,7 @@ const AddNote = () => {
     const handleSubmit = (e) => {
         e.preventDefault();
         addNote(note.title, note.description, note.tag);
+        props.addNoteSuccess();
     }
 
     const onChange = (e) => {
@@ -16,7 +17,7 @@ const AddNote = () => {
     }
 
     return (
-        <div className='container'>
+        <div className='container my-3'>
             <form onSubmit={handleSubmit}>
                 <div className="form-floating mb-3">
                     <input type="text" className="form-control" id="title" name='title' placeholder="title" onChange={onChange} />
@@ -30,9 +31,9 @@ const AddNote = () => {
                     <input type="text" className="form-control" id="tag" name='tag' placeholder="tag" onChange={onChange} />
                     <label htmlFor="tag">Tag</label>
                 </div>
-                <button disabled={note.title.length<3 || note.description.length<5} type="submit" className="btn btn-primary">Add Note</button>
-
+                <button disabled={note.title.length < 3 || note.description.length < 5} type="submit" className="btn btn-primary">Add Note</button>
             </form>
+            <button className="btn btn-primary mt-3" onClick={props.addNoteAborted}>Close</button>
         </div>
     );
 }

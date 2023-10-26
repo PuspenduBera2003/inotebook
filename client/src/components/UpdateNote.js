@@ -1,9 +1,13 @@
 import React, { useRef, useState, useContext, useEffect } from 'react';
 import NoteContext from '../context/notes/NoteContext';
+import AlertContext from '../context/alert/AlertContext'
 
 const UpdateNote = ({note, onClose}) => {
     const context = useContext(NoteContext);
     const { editNote } = context;
+    const Alertcontext = useContext(AlertContext);
+    const { setAlertMessage } = Alertcontext;
+
     const refOpen = useRef(null);
     const refClose = useRef(null);
     const [editedNote, setEditedNote] = useState({
@@ -25,11 +29,13 @@ const UpdateNote = ({note, onClose}) => {
         editNote(editedNote.id, editedNote.etitle, editedNote.edescription, editedNote.etag, currentDate);
         onClose();
         refClose.current.click();
+        setAlertMessage("Note updated successfully", "success")
     };
 
     const handleClose =() => {
         onClose();
         refClose.current.click();
+        setAlertMessage("Note isn't updated", "danger")
     }
 
     const onChange = (e) => {

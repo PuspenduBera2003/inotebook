@@ -105,8 +105,8 @@ router.post('/login', [
 
     const { username, password } = req.body;
     try {
-        let user = await User.findOne({ username });
         let success = false;
+        let user = await User.findOne({ username });
         if (!user) {
             return res.status(400).json({success, error: "Please login with correct credentials" });
         }
@@ -123,7 +123,7 @@ router.post('/login', [
         }
         const authToken = jwt.sign(data, secretKey);
         success = true;
-        res.json({success, authToken });
+        res.json({success, authToken, user });
 
     } catch (error) {
         console.error(error);
@@ -136,7 +136,7 @@ router.post('/getuser', fetchuser,  async (req, res) => {
     try {
         let userID = req.user.id;
         const user = await User.findById(userID).select('-password');
-        res.send(user);
+        res.json({user});
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error.' });

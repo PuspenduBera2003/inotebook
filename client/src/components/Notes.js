@@ -64,7 +64,7 @@ const Notes = () => {
             <div className="container mt-2 mx-5">
                 <h4 className="card-header">Your Notes</h4>
             </div>
-            <div className="container mx-5 my-3">
+            <div className="container my-3">
                 {notes.length === 0 ? 'No notes created'
                     : <div className='container d-flex flex-wrap mt-5'>
                         {

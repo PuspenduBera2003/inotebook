@@ -2,6 +2,7 @@ import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import './css/Login.css'
 import AlertContext from '../context/alert/AlertContext'
+import UserContext from '../context/user/UserContext'
 
 const Login = (props) => {
     const [credentials, setCredentials] = useState({ username: "", password: "" })
@@ -10,6 +11,9 @@ const Login = (props) => {
     const context = useContext(AlertContext);
 
     const { setAlertMessage } = context;
+    const userContext = useContext(UserContext);
+
+    const { fetchUserdetails } = userContext;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -25,6 +29,7 @@ const Login = (props) => {
         if (json.success) {
             // Save the auth token and redirect
             localStorage.setItem('iNotebookToken', json.authToken);
+            fetchUserdetails();
             navigate("/");
 
         }

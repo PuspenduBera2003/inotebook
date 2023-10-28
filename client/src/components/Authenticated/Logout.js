@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import AlertContext from '../context/alert/AlertContext';
+import AlertContext from '../../context/alert/AlertContext';
 
 const Logout = () => {
     const navigate = useNavigate();

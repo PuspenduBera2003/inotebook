@@ -1,6 +1,8 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import Logout from './Logout';
+import Logout from './Authenticated/Logout';
+import UserIcon from './Authenticated/UserIcon';
+
 
 const Navbar = () => {
     const location = useLocation();
@@ -25,7 +27,10 @@ const Navbar = () => {
                         <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>
                         <Link className="btn btn-primary mx-1" to="/signup" role="button">Signup</Link>
                     </form>
-                    :<Logout/>}
+                    : <form className="d-flex flex-wrap" role="search">
+                        <UserIcon/>
+                        <Logout/>
+                    </form>}
                 </div>
             </div>
         </nav>

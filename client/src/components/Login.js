@@ -1,10 +1,15 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import './css/Login.css'
+import AlertContext from '../context/alert/AlertContext'
 
 const Login = (props) => {
     const [credentials, setCredentials] = useState({ username: "", password: "" })
     let navigate = useNavigate();
+
+    const context = useContext(AlertContext);
+
+    const { setAlertMessage } = context;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -19,12 +24,12 @@ const Login = (props) => {
         const json = await response.json()
         if (json.success) {
             // Save the auth token and redirect
-            localStorage.setItem('token', json.authtoken);
+            localStorage.setItem('iNotebookToken', json.authToken);
             navigate("/");
 
         }
         else {
-            alert("Invalid credentials");
+            setAlertMessage("Please login with correct credentials", "danger")
         }
     }
 
@@ -34,6 +39,7 @@ const Login = (props) => {
 
     return (
         <div className='container my-3' style={{ maxWidth: '30rem' }}>
+            <h4 className="card-header mb-4">Login to continue to iNotebook</h4>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="username" className="form-label">Username</label>
@@ -45,7 +51,7 @@ const Login = (props) => {
                 </div>
 
                 <button type="submit" className="btn btn-primary">
-                   <i className="fa-solid fa-right-to-bracket"></i>
+                    <i className="fa-solid fa-right-to-bracket"></i>
                 </button>
             </form>
             <div className="container mt-3 mx-0">

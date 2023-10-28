@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import Logout from './Logout';
 
 const Navbar = () => {
     const location = useLocation();
     return (
-        <nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top shadow shadow-lg">
+        <nav className="navbar navbar-expand-lg bg-body-tertiary sticky-top shadow shadow-sm">
             <div className="container-fluid">
                 <Link className="navbar-brand" to="/">iNotebook</Link>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -19,10 +20,12 @@ const Navbar = () => {
                             <Link className={`nav-link ${location.pathname === '/about' ? "active" : ""}`} to="/about">About</Link>
                         </li>
                     </ul>
+                    {!localStorage.getItem('iNotebookToken')?
                     <form className="d-flex" role="search">
                         <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>
                         <Link className="btn btn-primary mx-1" to="/signup" role="button">Signup</Link>
                     </form>
+                    :<Logout/>}
                 </div>
             </div>
         </nav>

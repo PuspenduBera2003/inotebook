@@ -17,11 +17,11 @@ const NoteState = (props) => {
             method: "GET",
             headers: {
                 "Content-Type": "application/json",
-                "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjUyZDUwMmIyNDI3MGE0MWE5NWIyMTI4In0sImlhdCI6MTY5NzQ3MDg0MH0.6gf8mmFulVsNIMu9Vms4KxgOl54RsO72iGK_AmzsRqQ"
+                "auth-token": localStorage.getItem('iNotebookToken')
 
             },
         });
-
+        
         // Showing All Notes at Client Side
         const json = await response.json()
         setNotes(json)
@@ -35,7 +35,7 @@ const NoteState = (props) => {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjUyZDUwMmIyNDI3MGE0MWE5NWIyMTI4In0sImlhdCI6MTY5NzQ3MDg0MH0.6gf8mmFulVsNIMu9Vms4KxgOl54RsO72iGK_AmzsRqQ"
+                "auth-token": localStorage.getItem('iNotebookToken')
 
             },
             body: JSON.stringify({ title, description, tag }),
@@ -55,7 +55,7 @@ const NoteState = (props) => {
             method: "DELETE",
             headers: {
                 "Content-Type": "application/json",
-                "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjUyZDUwMmIyNDI3MGE0MWE5NWIyMTI4In0sImlhdCI6MTY5NzQ3MDg0MH0.6gf8mmFulVsNIMu9Vms4KxgOl54RsO72iGK_AmzsRqQ"
+                "auth-token": localStorage.getItem('iNotebookToken')
 
             },
         });
@@ -76,7 +76,7 @@ const NoteState = (props) => {
 
             headers: {
                 "Content-Type": "application/json",
-                "auth-token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7ImlkIjoiNjUyZDUwMmIyNDI3MGE0MWE5NWIyMTI4In0sImlhdCI6MTY5NzQ3MDg0MH0.6gf8mmFulVsNIMu9Vms4KxgOl54RsO72iGK_AmzsRqQ"
+                "auth-token": localStorage.getItem('iNotebookToken')
 
             },
             body: JSON.stringify({ title, description, tag }),

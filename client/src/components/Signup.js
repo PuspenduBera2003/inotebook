@@ -10,6 +10,20 @@ const Signup = () => {
 
   const [credentials, setCredentials] = useState({ name: "", username: "", email: "", password: "", cnfrmpassword: "" })
 
+  const [passwordFieldState, setPasswordFieldState] = useState({
+    password: false,
+    cnfrmpassword: false
+  });
+
+  function togglePassword(inputId) {
+    // Create a copy of the state object
+    const updatedState = { ...passwordFieldState };
+    // Toggle the state for the corresponding input ID
+    updatedState[inputId] = !updatedState[inputId];
+    // Update the state with the modified object
+    setPasswordFieldState(updatedState);
+  }
+
   let navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -37,7 +51,7 @@ const Signup = () => {
       }
       else {
         console.error(json);
-        setAlertMessage(json.error,'danger')
+        setAlertMessage(json.error, 'danger')
       }
     }
   }
@@ -48,6 +62,7 @@ const Signup = () => {
 
   return (
     <div className='container my-3' style={{ maxWidth: '30rem' }}>
+      <h4 className="header text-center mb-4">Create an account to use iNotebook</h4>
       <form onSubmit={handleSubmit} className='needs-validation'>
         <div className="mb-3">
           <label htmlFor="name" className="form-label">Name</label>
@@ -64,13 +79,45 @@ const Signup = () => {
           <label htmlFor="email" className="form-label">Email</label>
           <input type="email" className="form-control" value={credentials.email} onChange={onChange} id="email" name="email" />
         </div>
-        <div className="mb-3">
-          <label htmlFor="password" className="form-label">Create New Password</label>
-          <input type="password" className="form-control" value={credentials.password} onChange={onChange} name="password" id="password" minLength={8} required />
+        <label htmlFor="password" className="form-label">Create New Password</label>
+        <div className="input-group mb-3">
+          <input
+            type={passwordFieldState.password ? "text" : "password"}
+            className="form-control"
+            value={credentials.password}
+            onChange={onChange}
+            id="password"
+            name="password"
+            minLength={8}
+            required
+          />
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={() => togglePassword('password')}
+          >
+            {passwordFieldState.password ? <i className="fa-regular fa-eye-slash"></i> : <i className="fa-regular fa-eye"></i>}
+          </button>
         </div>
-        <div className="mb-3">
-          <label htmlFor="cnfrmpassword" className="form-label">Confirm Password</label>
-          <input type="password" className="form-control" value={credentials.cnfrmpassword} onChange={onChange} name="cnfrmpassword" id="cnfrmpassword" />
+        <label htmlFor="cnfrmpassword" className="form-label">Confirm Password</label>
+        <div className="input-group mb-3">
+          <input
+            type={passwordFieldState.cnfrmpassword ? "text" : "password"}
+            className="form-control"
+            value={credentials.cnfrmpassword}
+            onChange={onChange}
+            id="cnfrmpassword"
+            name="cnfrmpassword"
+            minLength={8}
+            required
+          />
+          <button
+            type="button"
+            className="btn btn-outline-secondary"
+            onClick={() => togglePassword('cnfrmpassword')}
+          >
+            {passwordFieldState.cnfrmpassword ? <i className="fa-regular fa-eye-slash"></i> : <i className="fa-regular fa-eye"></i>}
+          </button>
         </div>
         <button type="submit" className="btn btn-primary">
           Sign Up

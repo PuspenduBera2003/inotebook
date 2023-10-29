@@ -15,6 +15,19 @@ const Login = (props) => {
 
     const { fetchUserdetails } = userContext;
 
+    const [passwordFieldState, setPasswordFieldState] = useState({
+        password: false,
+    });
+
+    function togglePassword(inputId) {
+        // Create a copy of the state object
+        const updatedState = { ...passwordFieldState };
+        // Toggle the state for the corresponding input ID
+        updatedState[inputId] = !updatedState[inputId];
+        // Update the state with the modified object
+        setPasswordFieldState(updatedState);
+    }
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         const url = process.env.REACT_APP_SERVER_URL_FOR_LOGIN
@@ -50,11 +63,26 @@ const Login = (props) => {
                     <label htmlFor="username" className="form-label">Username</label>
                     <input type="text" className="form-control" value={credentials.username} onChange={onChange} id="username" name="username" minLength={5} required />
                 </div>
-                <div className="mb-3">
-                    <label htmlFor="password" className="form-label">Password</label>
-                    <input type="password" className="form-control" value={credentials.password} onChange={onChange} name="password" id="password" minLength={8} required />
+                <label htmlFor="password" className="form-label">Password</label>
+                <div className="input-group mb-3">
+                    <input
+                        type={passwordFieldState.password ? "text" : "password"}
+                        className="form-control"
+                        value={credentials.password}
+                        onChange={onChange}
+                        id="password"
+                        name="password"
+                        minLength={8}
+                        required 
+                    />
+                    <button
+                        type="button"
+                        className="btn btn-outline-secondary"
+                        onClick={() => togglePassword('password')}
+                    >
+                        {passwordFieldState.password ? <i className="fa-regular fa-eye-slash"></i> : <i className="fa-regular fa-eye"></i>}
+                    </button>
                 </div>
-
                 <button type="submit" className="btn btn-primary">
                     <i className="fa-solid fa-right-to-bracket"></i>
                 </button>

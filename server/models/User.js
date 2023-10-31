@@ -18,6 +18,10 @@ const UserSchema = new Schema({
         type: String,
         required: true
     },
+    friends: [{
+        type: String,
+        ref: 'user'
+    }],
     date: {
         type: Date,
         default: Date.now

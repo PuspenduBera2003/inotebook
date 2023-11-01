@@ -10,7 +10,6 @@ const UpdatePassword = () => {
         newPassword: false,
         cNewPassword: false,
     });
-    const [modalClosed, setModalClosed] = useState(false);
     const Alertcontext = useContext(AlertContext);
     const { setAlertMessage } = Alertcontext;
     const [updatedPassword, setUpdatedPassword] = useState({ password: "", newPassword: "", cNewPassword: "" });
@@ -40,11 +39,6 @@ const UpdatePassword = () => {
 
     const onChange = (e) => {
         setUpdatedPassword({ ...updatedPassword, [e.target.name]: e.target.value });
-        if (updatedPassword.password.length > 8 && updatedPassword.newPassword.length > 8 && updatedPassword.cNewPassword.length > 8) {
-            setModalClosed(true);
-        } else {
-            setModalClosed(false)
-        }
     }
 
     const handleClose = () => {
@@ -53,7 +47,6 @@ const UpdatePassword = () => {
             newPassword: "",
             cNewPassword: ""
         });
-        setModalClosed(false)
     }
 
 
@@ -113,8 +106,6 @@ const UpdatePassword = () => {
                                             name="password"
                                             value={updatedPassword.password}
                                             onChange={onChange}
-                                            minLength={8}
-                                            required
                                         />
                                         <button
                                             type="button"
@@ -135,8 +126,6 @@ const UpdatePassword = () => {
                                             name="newPassword"
                                             value={updatedPassword.newPassword}
                                             onChange={onChange}
-                                            minLength={8}
-                                            required
                                         />
                                         <button
                                             type="button"
@@ -157,8 +146,6 @@ const UpdatePassword = () => {
                                             name="cNewPassword"
                                             value={updatedPassword.cNewPassword}
                                             onChange={onChange}
-                                            minLength={8}
-                                            required
                                         />
                                         <button
                                             type="button"
@@ -172,7 +159,7 @@ const UpdatePassword = () => {
                             </div>
                             <div className="modal-footer">
                                 <button type="button" className="btn btn-secondary" data-bs-dismiss="modal" onClick={handleClose}>Close</button>
-                                <button type="submit" className="btn btn-primary" data-bs-dismiss={modalClosed ? "modal" : undefined} >Save Changes</button>
+                                <button type="submit" className="btn btn-primary" data-bs-dismiss="modal">Save Changes</button>
                             </div>
                         </form>
                     </div>

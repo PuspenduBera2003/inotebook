@@ -21,6 +21,9 @@ const Navbar = () => {
                         <li className="nav-item">
                             <Link className={`nav-link ${location.pathname === '/about' ? "active" : ""}`} to="/about">About</Link>
                         </li>
+                        <li className="nav-item">
+                            <Link className={`nav-link ${location.pathname === '/friends' ? "active" : ""}`} to="/friends">Friends</Link>
+                        </li>
                     </ul>
                     {!localStorage.getItem('iNotebookToken')?
                     <form className="d-flex" role="search">

@@ -34,7 +34,10 @@ router.post('/send', fetchuser, async (req, res) => {
 
         // Check if a request already exists
         const existingRequest = await FriendRequest.findOne({ from: fromUserId, to: toUserId });
-        if (existingRequest) {
+        if (existingRequest && existingRequest.status === 'accept') {
+            return res.status(400).json({ success, message: "You are already friends" });
+        }
+        if (existingRequest && existingRequest.status === 'pending') {
             return res.status(400).json({ success, message: 'Friend request already sent' });
         }
 
@@ -58,11 +61,13 @@ router.get('/pendingrequests/:id', fetchuser, async (req, res) => {
             return res.status(400).json({ success, message: 'Invalid user ID' });
         }
         const pendingRequests = await FriendRequest.find({ to: req.params.id, status: "pending" });
-        if(!pendingRequests || pendingRequests.length === 0 ) {
-            res.status(200).json({success, message: 'No new friend requests'});
-        }
+        // Extract the IDs of the users where from the request is sent
+        const requestFrom = pendingRequests.map(request => request.from);
+
+        // Query for the profiles of the friends using $in
+        const pendingRequestsProfile = await User.find({ _id: { $in: requestFrom } });
         success = true;
-        res.status(200).json({ success, pendingRequests });
+        res.status(200).json({ success, pendingRequests, pendingRequestsProfile });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error.' });
@@ -91,6 +96,7 @@ router.put('/accept/:id', fetchuser, async (req, res) => {
         }
         // Update the status to accept
         pendingRequest.status = "accept";
+        pendingRequest.date = new Date();
         await pendingRequest.save();
 
         // Adds the friend data corresponding to the user
@@ -182,24 +188,22 @@ router.delete('/unfriend/:id', fetchuser, async (req, res) => {
 })
 
 // Route 6: For showing the list of accepted friends. login required
-router.get('/friends', fetchuser, async (req, res) => {
-    const { userId } = req.body;
+router.get('/:userid/friends', fetchuser, async (req, res) => {
+    const userId = req.params.userid;
     let success = false;
     const existingUser = await User.findById(userId);
-    if(!existingUser) {
-        return res.status(401).json({success, message: "You are not an existing user"});
+    if (!existingUser) {
+        return res.status(401).json({ success, message: "You are not an existing user" });
     }
     const acceptedRequests = await FriendRequest.find({ to: userId, status: "accept" });
-    if(!acceptedRequests || acceptedRequests.length === 0) {
-        return res.status(200).json({success, message: "You don't have any friend"});
-    }
+    
     // Extract the IDs of the friends who have accepted the request
     const friendIds = acceptedRequests.map(request => request.from);
 
     // Query for the profiles of the friends using $in
     const acceptedRequestsProfile = await User.find({ _id: { $in: friendIds } });
     success = true;
-    res.status(200).json({success, friends: acceptedRequestsProfile});
+    res.status(200).json({ success, friends: acceptedRequestsProfile, request: acceptedRequests });
 })
 
 module.exports = router

@@ -1,4 +1,4 @@
-iNotebook React App
+#iNotebook React App
 The I-Notebook React App is a web application designed to serve as a digital notebook for users. It allows users to create, store, and manage their notes securely. The app includes both frontend and backend components to provide a seamless user experience.
 
 Features

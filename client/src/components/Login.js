@@ -57,7 +57,7 @@ const Login = (props) => {
 
     return (
         <div className='container my-3' style={{ maxWidth: '30rem' }}>
-            <h4 className="card-header mb-4">Login to continue to iNotebook</h4>
+            <h4 className="card-header mb-4 text-center">Login to continue to iNotebook</h4>
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                     <label htmlFor="username" className="form-label">Username</label>

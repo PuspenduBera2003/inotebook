@@ -12,6 +12,7 @@ import Signup from './components/Signup';
 import Friends from './components/Authenticated/Friends/Friends';
 import { useContext } from 'react';
 import UserProfile from './components/Authenticated/UserProfile';
+import SearchUserResult from './components/Authenticated/SearchUserResult';
 
 const App = () => {
   const context = useContext(AlertContext);
@@ -47,6 +48,9 @@ const App = () => {
               exact path="/friends"
               element={<Friends />}
             />
+            <Route
+              path="/user"
+              element={<SearchUserResult />} />
           </Routes>
         </Router>
       </NoteState>

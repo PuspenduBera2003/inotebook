@@ -29,11 +29,21 @@ router.post('/send', fetchuser, async (req, res) => {
         // Check if request is send to an existing user
         const toExistingUser = await User.findById(toUserId)
         if (!toExistingUser) {
-            return res.status(401).json({ success, message: "The user you are trying to send request is't exist" });
+            return res.status(401).json({ success, message: "The user you are trying to send request isn't exist" });
+        }
+
+        // Check if request is from a different user or not
+        if (fromUserId === toUserId) {
+            return res.status(400).json({ success, message: 'You can not send friend request to yourself' })
         }
 
         // Check if a request already exists
-        const existingRequest = await FriendRequest.findOne({ from: fromUserId, to: toUserId });
+        const existingRequest = await FriendRequest.findOne({
+            $or: [
+                { from: fromUserId, to: toUserId },
+                { from: toUserId, to: fromUserId }
+            ]
+        });
         if (existingRequest && existingRequest.status === 'accept') {
             return res.status(400).json({ success, message: "You are already friends" });
         }
@@ -101,18 +111,28 @@ router.put('/accept/:id', fetchuser, async (req, res) => {
 
         // Adds the friend data corresponding to the user
         let fromUser = await User.findById(pendingRequest.from);
-        const updatedUser = await User.findByIdAndUpdate(
+        let toUser = await User.findById(pendingRequest.to);
+        const updatedToUser = await User.findByIdAndUpdate(
             pendingRequest.to,
             { $push: { friends: { $each: [fromUser.username], $position: 0 } } },
             { new: true }
         );
+        const updatedFromUser = await User.findByIdAndUpdate(
+            pendingRequest.from,
+            { $push: { friends: { $each: [toUser.username], $position: 0 } } },
+            { new: true }
+        );
 
-        if (!updatedUser) {
-            return res.status(400).json({ success, message: 'Error updating user' });
+        if (!updatedToUser) {
+            return res.status(400).json({ success, message: 'Error updating user the request send to' });
+        }
+
+        if (!updatedFromUser) {
+            return res.status(400).json({ success, message: 'Error updating user the request send from' });
         }
 
         success = true;
-        res.json({ success, updatedUser, pendingRequest });
+        res.json({ success, updatedUser, updatedFromUser, pendingRequest });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error.' });
@@ -168,19 +188,25 @@ router.delete('/unfriend/:id', fetchuser, async (req, res) => {
         }
         // Delete the friend request
         friend = await FriendRequest.findByIdAndDelete(req.params.id)
-        let removeFriend = await User.findById(friend.from);
+        let removeFriendFrom = await User.findById(friend.from);
+        let removeFriendTo = await User.findById(friend.to);
         // Remove the friend from the user's friends array
-        const updatedUser = await User.findByIdAndUpdate(
+        const updatedUserTo = await User.findByIdAndUpdate(
             friend.to,
-            { $pull: { friends: removeFriend.username } },
+            { $pull: { friends: removeFriendFrom.username } },
+            { new: true }
+        );
+        const updatedUserFrom = await User.findByIdAndUpdate(
+            friend.from,
+            { $pull: { friends: removeFriendTo.username } },
             { new: true }
         );
 
-        if (!updatedUser) {
+        if (!updatedUserTo || !updatedUserFrom) {
             return res.status(500).json({ success, message: "Error removing friend from user's friends array" });
         }
         success = true;
-        res.json({ success, message: `${removeFriend.username} has been unfriend`, friend });
+        res.json({ success, message: `${removeFriendFrom.username} has been unfriend`, friend });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error.' });
@@ -195,15 +221,27 @@ router.get('/:userid/friends', fetchuser, async (req, res) => {
     if (!existingUser) {
         return res.status(401).json({ success, message: "You are not an existing user" });
     }
-    const acceptedRequests = await FriendRequest.find({ to: userId, status: "accept" });
-    
+    const acceptedRequests = await FriendRequest.find({
+        $or: [
+            { to: userId, status: "accept" },
+            { from: userId, status: "accept" }
+        ]
+    });
+
     // Extract the IDs of the friends who have accepted the request
     const friendIds = acceptedRequests.map(request => request.from);
 
-    // Query for the profiles of the friends using $in
-    const acceptedRequestsProfile = await User.find({ _id: { $in: friendIds } });
+    // Extract the 'to' IDs from the requests
+    const toIds = acceptedRequests.map(request => request.to);
+
+    // Query for the profiles of the friends and 'to' users using $in
+    const acceptedRequestsProfile = await User.find({ _id: { $in: friendIds.concat(toIds) } });
+
+    // Remove the user with _id equal to req.params.userid
+    const filteredAcceptedRequestsProfile = acceptedRequestsProfile.filter(user => user._id.toString() !== userId);
+
     success = true;
-    res.status(200).json({ success, friends: acceptedRequestsProfile, request: acceptedRequests });
+    res.status(200).json({ success, friends: filteredAcceptedRequestsProfile, request: acceptedRequests });
 })
 
 module.exports = router

@@ -2,13 +2,19 @@ import React, { useContext, useEffect } from 'react'
 import friendContext from '../../../context/friends/FriendContext'
 import PendingRequest from './PendingRequest';
 import CurrentFriends from './CurrentFriends';
+import { useNavigate } from 'react-router-dom';
 
 const Friends = () => {
     const pendingRequests = useContext(friendContext);
     const { pendingFriends, showPendingRequests, friends, currentFriends } = pendingRequests;
+    const navigate = useNavigate();
     useEffect(() => {
         showPendingRequests();
         currentFriends();
+        let token = localStorage.getItem('iNotebookToken');
+        if(!token){
+            navigate('/login');
+        }
     }, []);
     
     return (

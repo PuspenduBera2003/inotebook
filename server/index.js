@@ -12,6 +12,7 @@ app.use(cors())
 app.use('/api/auth', require('./routes/auth'))
 app.use('/api/notes', require('./routes/notes'))
 app.use('/api/friendrequests', require('./routes/friendreq'))
+app.use('/api/user', require('./routes/search_user'))
 
 app.listen(port, () => {
     console.log(`iNotebook Backend is running on http://localhost:${port}`);

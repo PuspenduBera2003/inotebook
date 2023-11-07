@@ -50,19 +50,90 @@ const FriendState = (props) => {
                 console.error("User data is not available or does not have _id.")
             }
         } catch (error) {
-            console.error("Error while fetching pending requests:", error);
+            console.error("Error while fetching friends:", error);
+        }
+    }
+
+    // Accept friend request
+    const acceptRequest = async (request_id) => {
+        try {
+            if (user && user.user && user.user._id) {
+                const url = `${host}/api/friendrequests/accept/${request_id}`
+                const response = await fetch(url, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "auth-token": localStorage.getItem('iNotebookToken')
+                    }
+                });
+                const json = await response.json();
+                return json;
+            } else {
+                console.error("User data is not available or does not have _id.")
+            }
+        } catch (error) {
+            console.error("Error while accepting request:", error);
+        }
+    }
+
+    // Reject friend request
+    const rejectRequest = async (request_id) => {
+        try {
+            if (user && user.user && user.user._id) {
+                const url = `${host}/api/friendrequests/reject/${request_id}`
+                const response = await fetch(url, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "auth-token": localStorage.getItem('iNotebookToken')
+                    }
+                });
+                const json = await response.json();
+                return json;
+            } else {
+                console.error("User data is not available or does not have _id.")
+            }
+        } catch (error) {
+            console.error("Error while rejecting request:", error);
+        }
+    }
+
+    // Unfriend an existing friend
+    const unFriend = async (request_id) => {
+        try {
+            if (user && user.user && user.user._id) {
+                const url = `${host}/api/friendrequests/unfriend/${request_id}`
+                const response = await fetch(url, {
+                    method: "DELETE",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "auth-token": localStorage.getItem('iNotebookToken')
+                    }
+                });
+                const json = await response.json();
+                return json;
+            } else {
+                console.error("User data is not available or does not have _id.")
+            }
+        } catch (error) {
+            console.error("Error while rejecting request:", error);
         }
     }
 
     useEffect(() => {
-        fetchUserdetails()
-            .then(() => {
-                setLoading(false); // Set loading to false when user data is available
-            })
-            .catch((error) => {
-                console.error("Error fetching user details:", error);
-                setLoading(false); // Set loading to false on error
-            });
+        if (localStorage.getItem('iNotebookToken') === null) {
+            setLoading(false);
+        }
+        else {
+            fetchUserdetails()
+                .then(() => {
+                    setLoading(false); // Set loading to false when user data is available
+                })
+                .catch((error) => {
+                    console.error("Error fetching user details:", error);
+                    setLoading(false); // Set loading to false on error
+                });
+        }
     }, []);
 
     if (loading) {
@@ -73,10 +144,10 @@ const FriendState = (props) => {
                 </div>
             </div>
         );
-    }    
+    }
 
     return (
-        <FriendContext.Provider value={{ pendingFriends, showPendingRequests, friends, currentFriends }}>
+        <FriendContext.Provider value={{ pendingFriends, showPendingRequests, friends, currentFriends, acceptRequest, rejectRequest, unFriend }}>
             {props.children}
         </FriendContext.Provider>
     )

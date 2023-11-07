@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import Logout from './Authenticated/Logout';
 import UserIcon from './Authenticated/UserIcon';
+import SearchUser from './Authenticated/SearchUser';
 
 
 const Navbar = () => {
@@ -21,19 +22,23 @@ const Navbar = () => {
                         <li className="nav-item">
                             <Link className={`nav-link ${location.pathname === '/about' ? "active" : ""}`} to="/about">About</Link>
                         </li>
-                        <li className="nav-item">
-                            <Link className={`nav-link ${location.pathname === '/friends' ? "active" : ""}`} to="/friends">Friends</Link>
-                        </li>
+                        {localStorage.getItem('iNotebookToken') &&
+                            <li className="nav-item">
+                                <Link className={`nav-link ${location.pathname === '/friends' ? "active" : ""}`} to="/friends">Friends</Link>
+                            </li>}
                     </ul>
-                    {!localStorage.getItem('iNotebookToken')?
-                    <form className="d-flex" role="search">
-                        <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>
-                        <Link className="btn btn-primary mx-1" to="/signup" role="button">Signup</Link>
-                    </form>
-                    : <form className="d-flex flex-wrap" role="search">
-                        <UserIcon/>
-                        <Logout/>
-                    </form>}
+                    {!localStorage.getItem('iNotebookToken') ?
+                        <form className="d-flex" role="search">
+                            <Link className="btn btn-primary mx-1" to="/login" role="button">Login</Link>
+                            <Link className="btn btn-primary mx-1" to="/signup" role="button">Signup</Link>
+                        </form>
+                        : <>
+                            <SearchUser />
+                            <form className="d-flex flex-wrap">
+                                <UserIcon />
+                                <Logout />
+                            </form>
+                        </>}
                 </div>
             </div>
         </nav>

@@ -3,6 +3,8 @@ import UserImage from '../image/user.png';
 import friendContext from '../../context/friends/FriendContext';
 import AlertContext from '../../context/alert/AlertContext';
 import { useNavigate } from 'react-router-dom';
+import Skeleton from '@mui/material/Skeleton';
+import Stack from '@mui/material/Stack';
 
 const SearchUserIndividualCard = (props) => {
     const { result, user } = props;
@@ -16,6 +18,7 @@ const SearchUserIndividualCard = (props) => {
     const [RequestSend, setRequestSend] = useState(false);
     const [currentFriend, setCurrentFriend] = useState(false);
     const [pendingRequest, setPendingRequest] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -60,9 +63,10 @@ const SearchUserIndividualCard = (props) => {
                         }
                     }
                 }
-
+                setLoading(false);
             } catch (error) {
                 console.error('Error fetching data:', error);
+                setLoading(false);
             }
         };
         fetchData();
@@ -115,15 +119,15 @@ const SearchUserIndividualCard = (props) => {
     const confirmRequest = async () => {
         const pendingRequestDetails = JSON.parse(localStorage.getItem(`pendingRequest[${result._id}]`));
         const response = await acceptRequest(pendingRequestDetails._id);
-        if(response.success === true) {
+        if (response.success === true) {
             localStorage.removeItem(`pendingRequest[${result._id}]`)
             setAlertMessage(`${result.name} and you are friends now`, "success");
-            setTimeout(() => {    
+            setTimeout(() => {
                 window.location.reload();
             }, 3000);
         } else {
             setAlertMessage("Error while confirming request", "danger");
-            setTimeout(() => {    
+            setTimeout(() => {
                 window.location.reload();
             }, 3000);
         }
@@ -132,69 +136,89 @@ const SearchUserIndividualCard = (props) => {
     const declineRequest = async () => {
         const pendingRequestDetails = JSON.parse(localStorage.getItem(`pendingRequest[${result._id}]`));
         const response = await rejectRequest(pendingRequestDetails._id);
-        if(response.success === true) {
+        if (response.success === true) {
             localStorage.removeItem(`pendingRequest[${result._id}]`)
             setAlertMessage(`Friend request of ${result.name} is rejected`, "success");
-            setTimeout(() => {    
+            setTimeout(() => {
                 window.location.reload();
             }, 3000);
         } else {
             setAlertMessage(`Error while rejecting request of ${result.name}`, "danger");
-            setTimeout(() => {    
+            setTimeout(() => {
                 window.location.reload();
             }, 3000);
         }
     }
 
+    
     return (
         <div className="card m-4" style={{ width: '18rem' }}>
             {currentFriend && (result._id !== user._id) && <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
                 Friend
-                <span className="visually-hidden">unread messages</span>
+                <span className="visually-hidden">frined</span>
             </span>}
-            {result._id === user._id && <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill" style={{backgroundColor: '#7e00ff'}}>
+            {result._id === user._id && <span className="position-absolute top-0 start-100 translate-middle badge rounded-pill" style={{ backgroundColor: '#7e00ff' }}>
                 My Profile
-                <span className="visually-hidden">unread messages</span>
+                <span className="visually-hidden">my profile</span>
             </span>}
-            <img src={UserImage} className="card-img-top m-auto my-2" alt={`${result.name}`} style={{ width: '8rem', height: '8rem' }} />
+            {loading ?
+                <Skeleton animation="wave" variant="circular" width={130} height={130} style={{ margin: 'auto', marginTop: '8px' }} />
+                :
+                <img src={UserImage} className="card-img-top m-auto my-2" alt={`${result.name}`} style={{ width: '8rem', height: '8rem' }} />}
             <div className="card-body">
-                <h5 className="card-title text-center">{result.name}</h5>
-                <p className="card-text" style={{ textAlign: 'justify' }}>This is the about section of the above user</p>
+                {loading ?
+                    <Skeleton variant="text" sx={{ fontSize: '2rem', width: '80%', margin: 'auto' }} />
+                    :
+                    <h5 className="card-title text-center">{result.name}</h5>}
+                {loading ?
+                    <Skeleton variant="text" sx={{ fontSize: '1rem' }} />
+                    :
+                    <p className="card-text" style={{ textAlign: 'justify' }}>This is the about section of the above user</p>}
             </div>
             <ul className="list-group list-group-flush">
                 <li className="list-group-item text-center">
-                    <b>Username:</b> {result.username}
+                    {loading ?
+                        <Skeleton variant="text" sx={{ fontSize: '1rem', width: '80%', margin: 'auto' }} />
+                        :
+                        <div>
+                            <b>Username:</b> {result.username}
+                        </div>}
                 </li>
             </ul>
             <div className="card-body d-flex justify-content-center">
-                {(result._id === user._id) ? <button className='btn btn-dark text-light' onClick={viewProfile}>
-                    View Your Profile
-                </button> :
-                    currentFriend ?
-                        <>
-                            <button type="button" className="btn btn-secondary me-3" style={{}}>
-                                <i className="fa-solid fa-message me-2"></i>
-                                Message
-                            </button>
-                            <button className='btn btn-danger' onClick={doUnfriend}>
-                                <i className="fa-solid fa-user-slash me-2"></i>Unfriend
-                            </button>
-                        </>
-                        : pendingRequest ?
-                            <div>
-                                <button type="button" className="btn btn-success me-3" style={{ width: '6rem' }} onClick={confirmRequest} >Confirm</button>
-                                <button type="button" className="btn btn-danger ml-3" style={{ width: '6rem' }} onClick={declineRequest} >Reject</button>
-                            </div>
-                            :
-                            RequestSend ? (
-                                <button type="button m-auto" className="btn btn-danger" onClick={doCancelRequest}>
-                                    <i className="fa-solid fa-user-xmark"></i> Cancel Request
+                {loading ?
+                <Skeleton variant="text" sx={{ fontSize: '2rem', width: '80%', margin: 'auto' }} />
+                :
+                <div>
+                    {(result._id === user._id) ? <button className='btn btn-dark text-light' onClick={viewProfile}>
+                        View Your Profile
+                    </button> :
+                        currentFriend ?
+                            <>
+                                <button type="button" className="btn btn-secondary me-3" style={{}}>
+                                    <i className="fa-solid fa-message me-2"></i>
+                                    Message
                                 </button>
-                            ) : (
-                                <button type="button m-auto" className="btn btn-primary" onClick={addFriend}>
-                                    <i className="fa-solid fa-user-plus"></i> Add Friend
+                                <button className='btn btn-danger' onClick={doUnfriend}>
+                                    <i className="fa-solid fa-user-slash me-2"></i>Unfriend
                                 </button>
-                            )}
+                            </>
+                            : pendingRequest ?
+                                <div>
+                                    <button type="button" className="btn btn-success me-3" style={{ width: '6rem' }} onClick={confirmRequest} >Confirm</button>
+                                    <button type="button" className="btn btn-danger ml-3" style={{ width: '6rem' }} onClick={declineRequest} >Reject</button>
+                                </div>
+                                :
+                                RequestSend ? (
+                                    <button type="button m-auto" className="btn btn-danger" onClick={doCancelRequest}>
+                                        <i className="fa-solid fa-user-xmark"></i> Cancel Request
+                                    </button>
+                                ) : (
+                                    <button type="button m-auto" className="btn btn-primary" onClick={addFriend}>
+                                        <i className="fa-solid fa-user-plus"></i> Add Friend
+                                    </button>
+                                )}
+                </div>}
             </div>
         </div>
     );

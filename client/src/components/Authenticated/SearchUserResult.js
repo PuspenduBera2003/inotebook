@@ -23,12 +23,7 @@ const SearchUserResult = () => {
     }, [navigate]);
     return (
         <div className='container my-2'>
-            {storedData &&
-                <div className='mt-4 d-flex justify-content-center align-content-center'>
-                    <h3 className='text-center d-inline bg-dark text-white p-2 rounded-2'>Matched Users</h3>
-                </div>
-            }
-            <div className="container d-flex flex-wrap justify-content-center mt-2 rounded-2" style={{ background: '#b7b7b7' }}>
+            <div className="container d-flex flex-wrap justify-content-center my-4 rounded-2" style={{ background: '#b7b7b7' }}>
                 {storedData && storedData.success && storedData.matchedUser.map((user) => (
                     <div key={user._id}>
                         <SearchUserIndividualCard result={user} user={currentUser} />

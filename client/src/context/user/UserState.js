@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import UserContext from "./UserContext";
-import loadingImage from '../../components/image/loading.png'
 
 const UserState = (props) => {
     const InitialUser = []
@@ -51,16 +50,11 @@ const UserState = (props) => {
 
     if (loading) {
         return (
-            <>
-                <div className="d-flex justify-content-center align-items-center" style={{ width: '100vw' }}>
-                    <img src={loadingImage} alt="loading" />
+            <div className="d-flex justify-content-center align-items-center" style={{ height: '100vh' }}>
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
                 </div>
-                <div className="d-flex justify-content-center align-items-center">
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
-                    </div>
-                </div>
-            </>
+            </div>
         );
     }
 

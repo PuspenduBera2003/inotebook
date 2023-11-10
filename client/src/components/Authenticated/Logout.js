@@ -8,13 +8,15 @@ const Logout = () => {
     const { setAlertMessage } = context;
 
     const handleLogout = () => {
-        localStorage.removeItem('iNotebookToken');
+        localStorage.clear();
         setAlertMessage("Logged out successfully", "success");
         navigate('/login');
     }
 
     return (
-        <button className='btn btn-primary mx-2' onClick={handleLogout}>Logout</button>
+        <button className='btn btn-danger mx-2' onClick={handleLogout}>
+            <i className="fa-solid fa-power-off"></i>
+        </button>
     );
 }
 

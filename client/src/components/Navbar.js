@@ -34,10 +34,10 @@ const Navbar = () => {
                         </form>
                         : <>
                             <SearchUser />
-                            <form className="d-flex flex-wrap">
+                            <div className="d-flex flex-wrap">
                                 <UserIcon />
                                 <Logout />
-                            </form>
+                            </div>
                         </>}
                 </div>
             </div>

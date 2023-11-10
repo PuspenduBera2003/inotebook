@@ -51,8 +51,8 @@ const PendingRequest = (props) => {
                 <p className="card-text text-muted" style={{ fontSize: '13px' }}>{formattedDate}</p>
             </div>
             <div className="card-footer">
-                <button type="button" className="btn btn-primary me-3" style={{ width: '6rem' }} onClick={confirmRequest}>Confirm</button>
-                <button type="button" className="btn btn-primary ml-3" style={{ width: '6rem' }} onClick={declineRequest}>Reject</button>
+                <button type="button" className="btn btn-success me-3" style={{ width: '6rem' }} onClick={confirmRequest}>Confirm</button>
+                <button type="button" className="btn btn-danger ml-3" style={{ width: '6rem' }} onClick={declineRequest}>Reject</button>
             </div>
         </div>
     )

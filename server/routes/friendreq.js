@@ -132,7 +132,7 @@ router.put('/accept/:id', fetchuser, async (req, res) => {
         }
 
         success = true;
-        res.json({ success, updatedUser, updatedFromUser, pendingRequest });
+        res.json({ success, updatedToUser, updatedFromUser, pendingRequest });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error.' });
@@ -140,7 +140,7 @@ router.put('/accept/:id', fetchuser, async (req, res) => {
 })
 
 // Route 4: For rejecting friend requests, login required
-router.put('/reject/:id', fetchuser, async (req, res) => {
+router.delete('/reject/:id', fetchuser, async (req, res) => {
     try {
         let success = false;
         // Check whether the friend request is existed
@@ -159,20 +159,51 @@ router.put('/reject/:id', fetchuser, async (req, res) => {
             return res.status(400).json({ success, message: "Friend request already rejected" });
         }
         // Update the status to reject
-        pendingRequest.status = "reject";
-        await pendingRequest.save();
+        const delete_request = await FriendRequest.deleteOne(pendingRequest)
+        if(!delete_request) {
+            return res.status(400).json({ success, message: "Error while rejecting request"});
+        }
         success = true;
-        res.json({ success, pendingRequest })
+        res.status(200).json({ success, pendingRequest })
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error.' });
     }
 })
 
-// Route 5: For unfriending an existing friend, login required
+// Route 5: For cancelling an existing pending Request, login required
+router.delete('/cancel/:id', fetchuser, async (req, res) => {
+    try {
+        let success = false;
+        // Check whether the friend request is existed
+        const isValidObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+        if (!isValidObjectId) {
+            return res.status(400).json({ success, message: 'Invalid friend request ID' });
+        }
+
+        // Find the request to be cancelled
+        let pending_request = await FriendRequest.findById(req.params.id);
+        if(!pending_request) {
+            return res.status(404).json({ success, message: "Request Not found" });
+        }
+        if(pending_request.status.toString() === "pending") {
+            pending_request = await FriendRequest.findByIdAndDelete(req.params.id);
+            const request_to = await User.findById(pending_request.to);
+            success = true;
+            return res.status(200).json({success, message: `Your request to ${request_to.name} has been cancelled`});
+        } else {
+            return res.status(400).json({success, message: 'Unable to cancel the request'});
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error.' });
+    }
+})
+
+// Route 6: For unfriending an existing friend, login required
 router.delete('/unfriend/:id', fetchuser, async (req, res) => {
     try {
-        let success = false
+        let success = false;
         // Check whether the friend request is existed
         const isValidObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
         if (!isValidObjectId) {
@@ -183,7 +214,7 @@ router.delete('/unfriend/:id', fetchuser, async (req, res) => {
         if (!friend) {
             return res.status(404).json({ success, message: "Not Found!!" });
         };
-        if (friend.status.toString() === "pending" || friend.status.toString() === "reject") {
+        if (friend.status.toString() === "pending") {
             return res.status(400).json({ success, message: "You cannot unfriend this user since you are not friend" });
         }
         // Delete the friend request
@@ -206,14 +237,14 @@ router.delete('/unfriend/:id', fetchuser, async (req, res) => {
             return res.status(500).json({ success, message: "Error removing friend from user's friends array" });
         }
         success = true;
-        res.json({ success, message: `${removeFriendFrom.username} has been unfriend`, friend });
+        res.json({ success, message: 'Successfully unfriend', friend });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Server error.' });
     }
 })
 
-// Route 6: For showing the list of accepted friends. login required
+// Route 7: For showing the list of accepted friends. login required
 router.get('/:userid/friends', fetchuser, async (req, res) => {
     const userId = req.params.userid;
     let success = false;
@@ -242,6 +273,30 @@ router.get('/:userid/friends', fetchuser, async (req, res) => {
 
     success = true;
     res.status(200).json({ success, friends: filteredAcceptedRequestsProfile, request: acceptedRequests });
+})
+
+// Route 8: For showing pending friend requests sent from user, login required
+router.get('/requestsend/:id', fetchuser, async (req, res) => {
+    try {
+        let success = false;
+        // Check whether the user is existed in iNotebook mongoDB collection or not
+        const isValidObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
+        if (!isValidObjectId) {
+            return res.status(400).json({ success, message: 'Invalid user ID' });
+        }
+        const pendingRequests = await FriendRequest.find({ from: req.params.id, status: "pending" });
+        // Extract the IDs of the users where from the request is sent
+        const requestFrom = pendingRequests.map(request => request.to);
+
+        // Query for the profiles of the friends using $in
+        const pendingRequestsProfile = await User.find({ _id: { $in: requestFrom } });
+        success = true;
+        res.status(200).json({ success, pendingRequests, pendingRequestsProfile });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server error.' });
+    }
+
 })
 
 module.exports = router

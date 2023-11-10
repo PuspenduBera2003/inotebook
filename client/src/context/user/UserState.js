@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import UserContext from "./UserContext";
+import loadingImage from '../../components/image/loading.png'
 
 const UserState = (props) => {
     const InitialUser = []
@@ -29,6 +30,38 @@ const UserState = (props) => {
         const matchedUser = await response.json();
         localStorage.setItem("searchResult", JSON.stringify(matchedUser));
         return matchedUser
+    }
+
+    const [loading, setLoading] = useState(true); // Add a loading state
+    useEffect(() => {
+        if (localStorage.getItem('iNotebookToken') === null) {
+            setLoading(false);
+        }
+        else {
+            fetchUserdetails()
+                .then(() => {
+                    setLoading(false); // Set loading to false when user data is available
+                })
+                .catch((error) => {
+                    console.error("Error fetching user details:", error);
+                    setLoading(false); // Set loading to false on error
+                });
+        }
+    }, []);
+
+    if (loading) {
+        return (
+            <>
+                <div className="d-flex justify-content-center align-items-center" style={{ width: '100vw' }}>
+                    <img src={loadingImage} alt="loading" />
+                </div>
+                <div className="d-flex justify-content-center align-items-center">
+                    <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+            </>
+        );
     }
 
     return (
